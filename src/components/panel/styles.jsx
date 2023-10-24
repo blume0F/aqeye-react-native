@@ -26,6 +26,12 @@ const styles = StyleSheet.create({
     fontSize: SIZES.h4,
     color: COLORS.accent,
   },
+  city: {
+    paddingTop: 5,
+    fontWeight: 'bold',
+    fontSize: SIZES.h2,
+    color: "#00a86b",
+  },
   txtRow: {
     flexDirection: 'row',
   },

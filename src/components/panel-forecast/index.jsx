@@ -3,14 +3,14 @@ import { View, Text, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { COLORS } from "../../constants/theme";
 import styles from "./styles";
+import Entypo from "react-native-vector-icons/Entypo";
+import { useNavigation } from "@react-navigation/native";
 
 const PannelForecast = (props) => {
-  const { data } = props;
-
+  const { data, countryDetails } = props;
+  const navigation = useNavigation();
   const [airQuality, setAirQuality] = useState();
-
   const [collapse, setCollapse] = useState(false);
-
   const [date] = useState(new Date(data.dt * 1000).toLocaleDateString("en-GB"));
   const [time] = useState(
     new Date(data.dt * 1000).toLocaleTimeString("en-GB").slice(0, 5)
@@ -40,6 +40,18 @@ const PannelForecast = (props) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.cityRow}>
+        <View>
+          <Text style={styles.city}>{countryDetails}</Text>
+        </View>
+        <TouchableOpacity onPress={() => {}}>
+          <Entypo name="area-graph" size={25} color={COLORS.accent}
+          onPress={() =>
+            navigation.navigate("Graph",{graphData:data,countryData:countryDetails})
+          }
+          />
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity
         onPress={() => {
           setCollapse(!collapse);
@@ -52,9 +64,7 @@ const PannelForecast = (props) => {
               {" | "}
               {time}
             </Text>
-            <Text style={styles.index}>
-              Quality Index: {airQuality}
-            </Text>
+            <Text style={styles.index}>Quality Index: {airQuality}</Text>
           </View>
           <Icon
             name={!collapse ? "chevron-down-sharp" : "chevron-up-sharp"}

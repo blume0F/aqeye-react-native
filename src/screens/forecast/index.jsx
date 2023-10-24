@@ -1,55 +1,62 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, FlatList, Platform } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import styles from "./styles";
-import CITY_LIST from "../../data/countries.json";
 import { COLORS, SIZES } from "../../constants/theme";
 import Icon from "react-native-vector-icons/Ionicons";
-import { baseUrl, apiKey } from "../../constants/api";
-import Pannel from "../../components/panel";
+import { baseUrl, apiKey, WTF_GEO_API } from "../../constants/api";
 import PannelForecast from "../../components/panel-forecast";
 
 const ForecastScreen = () => {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [items, setItems] = useState(CITY_LIST);
-
-  const [lat, setLat] = useState();
-  const [lng, setLng] = useState();
-
+  const [value, setValue] = useState("");
+  const [items, setItems] = useState([]);
+  const [city, setCity] = useState("");
   const [data, setData] = useState();
   const [error, setError] = useState();
 
-  useEffect(() => {
-    setData();
-    const cityData = items.filter((val) => val.city === value);
-    if (cityData.length > 0) {
-      setLat(cityData[0].lat);
-      setLng(cityData[0].lng);
-    }
-  }, [items, value]);
+  let [debounceTimeout, setdebounceTimeout] = useState(null);
+  let geoApiOptions = {
+    method: "GET",
+    headers: {
+      "X-RapidAPI-Key": "c65e4c24aemsh3e43a4763b1dc0ap14f2ccjsn34a52d5a8758",
+      "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
+    },
+  };
 
-  useEffect(() => {
-    const apiCalling = async () => {
-      try {
-        const response = await fetch(
-          `${baseUrl}/forecast?lat=${lat}&lon=${lng}&appid=${apiKey}`
-        );
-        const json = await response.json();
-        setData(json.list);
-        setError(null);
-      } catch (err) {
-        setError(err);
-      }
-    };
-    if (lat && lng) {
-      apiCalling(lat, lng);
+  const loadOptions = (inputValue) => {
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
     }
-  }, [lat, lng]);
+    debounceTimeout = setTimeout(() => {
+      return fetch(
+        `${WTF_GEO_API}?minPopulation=10000&namePrefix=${inputValue}`,
+        geoApiOptions
+      )
+        .then((response) => response.json())
+        .then((response) => {
+          setItems(response.data);
+        });
+    }, 1000);
+  };
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  const weatherapi = async (item) => {
+    let latitude = item.value[0];
+    let longitude = item.value[1];
+    try {
+      const response = await fetch(
+        `${baseUrl}/forecast?lat=${latitude}&lon=${longitude}&appid=${apiKey}`
+      );
+      const json = await response.json();
+      setData(json.list);
+      setError(null);
+    } catch (err) {
+      setError(err);
+    }
+    // if (lat && lng) {
+    //   apiCalling(lat, lng);
+    // }
+  };
 
   return (
     <View>
@@ -59,6 +66,12 @@ const ForecastScreen = () => {
           <DropDownPicker
             open={open}
             searchable
+            onChangeSearchText={loadOptions}
+            onSelectItem={(item) => {
+              setCity(item.label)
+              console.log("finalyyyyyyyyy", item);
+              weatherapi(item);
+            }}
             searchPlaceholder="Type to get the city"
             searchTextInputStyle={{
               borderWidth: 0,
@@ -96,9 +109,9 @@ const ForecastScreen = () => {
               <Icon name="chevron-down-sharp" size={20} color={COLORS.accent} />
             )}
             value={value}
-            items={items.map(({ city }) => ({
+            items={items.map(({ city, latitude, longitude }) => ({
               label: city,
-              value: city,
+              value: [latitude, longitude],
             }))}
             setOpen={setOpen}
             setValue={setValue}
@@ -111,7 +124,7 @@ const ForecastScreen = () => {
           data={data}
           renderItem={({ item }) => (
             <View>
-              <PannelForecast data={item} />
+              <PannelForecast data={item} countryDetails={city} />
             </View>
           )}
         />

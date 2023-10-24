@@ -7,38 +7,30 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { COLORS, SIZES } from "../../constants/theme";
 import HomeScreen from "../../screens/home";
 import ForecastScreen from "../../screens/forecast";
+import Graph from "../graph";
+import { createStackNavigator } from '@react-navigation/stack';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-const Home = () => {
+const StackNavigator = () =>{
   return (
-    <View
-      style={{
-        backgroundColor: "#ccc",
-        justifyContent: "center",
-        flex: 1,
-        alignItems: "center",
-      }}
-    >
-      <Text style={{ fontSize: 25 }}>Home</Text>
-    </View>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="Home" component={HomeScreen} />
+    <Stack.Screen options={{headerShown: true,headerTintColor:"white",headerStyle:{backgroundColor:"#242334"}}} name="Graph" component={Graph} />
+    <Stack.Screen name="Map" component={Map} />
+    <Stack.Screen name="User" component={User} />
+  </Stack.Navigator>
   );
-};
+}
 
-const ForeCast = () => {
+const ForecastStackNavigator = () => {
   return (
-    <View
-      style={{
-        backgroundColor: "#ccc",
-        justifyContent: "center",
-        flex: 1,
-        alignItems: "center",
-      }}
-    >
-      <Text style={{ fontSize: 25 }}>Home</Text>
-    </View>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="Forecast" component={ForecastScreen} />
+    </Stack.Navigator>
   );
-};
+}
 
 const Map = () => {
   return (
@@ -50,7 +42,7 @@ const Map = () => {
         alignItems: "center",
       }}
     >
-      <Text style={{ fontSize: 25 }}>Home</Text>
+      <Text style={{ fontSize: 25 }}>Map</Text>
     </View>
   );
 };
@@ -81,8 +73,8 @@ const BottomTab = () => {
       }}
     >
       <Tab.Screen
-        name="Home"
-        component={HomeScreen}
+        name="HomeScreen"
+        component={StackNavigator}
         options={{
           tabBarLabel: "Home",
           tabBarIcon: ({ focused }) => (
@@ -98,8 +90,8 @@ const BottomTab = () => {
         }}
       />
       <Tab.Screen
-        name="Forecast"
-        component={ForecastScreen}
+        name="ForecastScreen"
+        component={ForecastStackNavigator}
         options={{
           tabBarLabel: "Forecast",
           tabBarIcon: ({ focused }) => (

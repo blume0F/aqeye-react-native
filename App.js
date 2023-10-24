@@ -1,6 +1,4 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import HomeScreen from "./src/screens/home";
+import { StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import BottomTab from "./src/components/bottom-tab";
@@ -9,7 +7,7 @@ export default function App() {
   return (
     <SafeAreaProvider style={styles.containers}>
       <NavigationContainer>
-        <BottomTab></BottomTab>
+        <BottomTab />
       </NavigationContainer>
     </SafeAreaProvider>
   );
